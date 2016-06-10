@@ -7,6 +7,7 @@ class FIFO {
         this.children = []
 
         this._initFifo()
+        this.open = true
     }
 
     _initFifo() {
@@ -45,22 +46,29 @@ class FIFO {
     }
 
     setReader(reader) {
-        let stream = fs.createReadStream(this.path)
-        stream.on('data', data => {
-            reader(data.toString())
-        })
+        if (this.open) {
+            let stream = fs.createReadStream(this.path)
+            stream.on('data', data => {
+                reader(data.toString())
+            })
+        }
     }
 
     read() {
-        return fs.readFileSync(this.path).toString()
+        if (this.open) {
+            return fs.readFileSync(this.path).toString()
+        }
     }
 
     write(string) {
-        let child = cp.exec('echo "' + string + '" > ' + this.path)
-        this.children.push(child)
+        if (this.open) {
+            let child = cp.exec('echo "' + string + '" > ' + this.path)
+            this.children.push(child)
+        }
     }
 
     close() {
+        this.open = false
         this._killChildren()
         if (!this.preserve) {
             this._unlink()
@@ -72,7 +80,17 @@ class FIFO {
     }
 
     _unlink() {
-        fs.unlinkSync(this.path)
+        if (this._statSafe(this.path)) {
+            fs.unlinkSync(this.path)
+        }
+    }
+
+    get open() {
+        return this._open && this._statSafe(this.path)
+    }
+
+    set open(value) {
+        this._open = value
     }
 }
 

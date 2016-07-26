@@ -2,12 +2,12 @@ const FIFO = require('../fifo')
 
 let fifo = new FIFO('asdf.fifo')
 setTimeout(() => {
-    fifo.setReader(console.log.bind(console))
-    fifo.write('hej')
+    fifo.read(console.log.bind(console))
+    fifo.write('Async')
 
     setTimeout(() => {
-        fifo.write('hej')
-        console.log(fifo.read())
+        fifo.write('Sync')
+        console.log(fifo.readSync())
         fifo.close()
     }, 4000)
 }, 1000)

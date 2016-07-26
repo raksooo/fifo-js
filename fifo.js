@@ -69,10 +69,16 @@ class FIFO {
         }
     }
 
-    write(string) {
+    write(string, callback) {
         if (this.open) {
-            let child = cp.exec('echo "' + string + '" > ' + this.path)
+            let child = cp.exec('echo "' + string + '" > ' + this.path, callback)
             this.children.push(child)
+        }
+    }
+
+    writeSync(string) {
+        if (this.open) {
+            let child = cp.execSync('echo "' + string + '" > ' + this.path)
         }
     }
 

@@ -6,8 +6,8 @@ setTimeout(() => {
     fifo.write('hej')
 
     setTimeout(() => {
+        fifo.write('hej')
         console.log(fifo.read())
-        fifo.close()
         fifo.close()
     }, 4000)
 }, 1000)

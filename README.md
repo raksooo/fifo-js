@@ -53,6 +53,7 @@ fifo.close()
 ## Todo
 * Don't remove file if it is not a fifo.
 * Add methods read, readSync, write, writeSync.
+* Write tests.
 
 ## Contact
 * http://oskarnyberg.com

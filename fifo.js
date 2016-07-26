@@ -77,7 +77,7 @@ class FIFO {
     }
 
     _killChildren() {
-        this.children.map(child => child.kill())
+        this.children.forEach(child => child.kill())
     }
 
     _unlink() {

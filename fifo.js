@@ -58,7 +58,7 @@ class FIFO {
     read(callback) {
         if (this.open) {
             return fs.readFile(this.path, (err, data) => {
-                callback(data.toString())
+                callback && callback(data.toString())
             })
         }
     }

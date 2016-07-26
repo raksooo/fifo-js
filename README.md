@@ -50,6 +50,10 @@ fifo.write(string)
 fifo.close()
 ```
 
+## Todo
+* Don't remove file if it is not a fifo.
+* Add methods read, readSync, write, writeSync.
+
 ## Contact
 * http://oskarnyberg.com
 * oskar@oskarnyberg.com

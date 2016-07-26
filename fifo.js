@@ -55,7 +55,15 @@ class FIFO {
         }
     }
 
-    read() {
+    read(callback) {
+        if (this.open) {
+            return fs.readFile(this.path, (err, data) => {
+                callback(data)
+            })
+        }
+    }
+
+    readSync() {
         if (this.open) {
             return fs.readFileSync(this.path).toString()
         }

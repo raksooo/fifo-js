@@ -51,7 +51,6 @@ fifo.close()
 ```
 
 ## Todo
-* Add methods read, readSync, write, writeSync.
 * Write tests.
 
 ## Contact

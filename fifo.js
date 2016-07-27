@@ -49,7 +49,7 @@ class FIFO {
 
         let stream = fs.createReadStream(this.path)
         stream.on('data', data => {
-            reader(data.toString())
+            reader(data.toString().trim())
         })
     }
 
@@ -57,7 +57,7 @@ class FIFO {
         this.throwIfOpen()
 
         return fs.readFile(this.path, (err, data) => {
-            callback && callback(data.toString())
+            callback && callback(data.toString().trim())
         })
     }
 
@@ -68,7 +68,7 @@ class FIFO {
     readSync() {
         this.throwIfOpen()
 
-        return fs.readFileSync(this.path).toString()
+        return fs.readFileSync(this.path).toString().trim()
     }
 
     write(string, callback) {

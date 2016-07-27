@@ -4,37 +4,50 @@ const expect = require('chai').expect,
       fs = require('fs')
 
 describe('Initialization', function() {
-    let fifo
-    let exceptionPath
 
-    before(function() {
-        fifo = new FIFO()
-    })
+    describe('File', function() {
+        let fifo
 
-    after(function() {
-        fs.unlink(exceptionPath)
-    })
+        beforeEach(function() {
+            fifo = new FIFO()
+        })
 
-    it('should exist a fifo at the objects path', function() {
-        let stat = fs.statSync(fifo.path)
-        expect(stat.isFIFO()).to.be.true
-    })
+        afterEach(function() {
+            fifo.close()
+        })
 
-    it('should preserve fifo when closed', function() {
-        new FIFO(fifo.path).close()
-        let stat = fs.statSync(fifo.path)
-        expect(stat.isFIFO()).to.be.true
+        it('should exist a fifo at the objects path', function() {
+            let stat = fs.statSync(fifo.path)
+            expect(stat.isFIFO()).to.be.true
+        })
+
+        it('should preserve fifo when closed', function() {
+            new FIFO(fifo.path).close()
+            let stat = fs.statSync(fifo.path)
+            expect(stat.isFIFO()).to.be.true
+        })
     })
 
     it('should not exist a fifo at the objects path', function() {
+        let fifo = new FIFO()
         fifo.close()
         expect(fs.statSync.bind(fs, fifo.path)).to.throw(Error)
     })
 
-    it('should throw exception since non-fifo file exists', function() {
-        exceptionPath = 'exceptionTest.fifo'
-        fs.closeSync(fs.openSync(exceptionPath, 'w'))
-        expect(() => new FIFO(exceptionPath)).to.throw(FIFOError)
+    describe('Non fifo file', function() {
+        let exceptionPath = 'exceptionTest.fifo'
+
+        before(function() {
+            fs.closeSync(fs.openSync(exceptionPath, 'w'))
+        })
+
+        after(function() {
+            fs.unlink(exceptionPath)
+        })
+
+        it('should throw exception since non-fifo file exists', function() {
+            expect(() => new FIFO(exceptionPath)).to.throw(FIFOError)
+        })
     })
 })
 

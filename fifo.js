@@ -11,7 +11,7 @@ class FIFO {
     }
 
     _initFifo() {
-        let stat = this._statSafe(this.path)
+        let stat = this._pathExists()
         if (!stat) {
             this._createFifo()
         } else if (!stat.isFIFO()) {
@@ -26,7 +26,8 @@ class FIFO {
         cp.execSync('mkfifo ' + this.path)
     }
 
-    _statSafe(path) {
+    _pathExists(path) {
+        path = path || this.path
         try {
             return fs.statSync(path)
         } catch(e) {
@@ -39,7 +40,7 @@ class FIFO {
         do {
             let random = Math.floor(Math.random() * 8999 + 1000)
             path = '/tmp/fifo-js-' + random + '.fifo'
-        } while (this._statSafe(path))
+        } while (this._pathExists(path))
 
         return path
     }
@@ -107,7 +108,7 @@ class FIFO {
     }
 
     _unlink() {
-        if (this._statSafe(this.path)) {
+        if (this._pathExists()) {
             fs.unlinkSync(this.path)
         }
     }
@@ -119,7 +120,7 @@ class FIFO {
     }
 
     get open() {
-        return this._open && this._statSafe(this.path)
+        return this._open && this._pathExists()
     }
 
     set open(value) {

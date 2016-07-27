@@ -7,7 +7,7 @@ class FIFO {
         this.path = path || this._generateFifoPath()
 
         this._initFifo()
-        this.open = true
+        this._open = true
     }
 
     _initFifo() {
@@ -100,7 +100,7 @@ class FIFO {
     }
 
     close() {
-        this.open = false
+        this._open = false
 
         if (!this.preserve) {
             this._unlink()
@@ -121,10 +121,6 @@ class FIFO {
 
     get open() {
         return this._open && this._pathExists()
-    }
-
-    set open(value) {
-        this._open = value
     }
 }
 

@@ -38,5 +38,22 @@ describe('Read and write', function() {
         })
         fifo.writeSync(string)
     })
+
+    describe('Reader', function() {
+        it('should read all values that\'s written', function(done) {
+            let reads
+
+            fifo.setReader(data => {
+                reads++
+                if (data === 'last') {
+                    expect(reads).to.equal(2)
+                    done()
+                }
+            })
+
+            fifo.writeSync('first')
+            fifo.writeSync('last')
+        })
+    })
 })
 

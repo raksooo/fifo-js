@@ -40,8 +40,9 @@ describe('Read and write', function() {
     })
 
     describe('Reader', function() {
+        this.timeout(2000)
         it('should read all values that\'s written', function(done) {
-            let reads
+            let reads = 0
 
             fifo.setReader(data => {
                 reads++
@@ -52,7 +53,9 @@ describe('Read and write', function() {
             })
 
             fifo.writeSync('first')
-            fifo.writeSync('last')
+            setTimeout(() => {
+                fifo.writeSync('last')
+            }, 1)
         })
     })
 })

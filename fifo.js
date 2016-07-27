@@ -47,16 +47,21 @@ class FIFO {
     setReader(reader) {
         this.throwIfClosed()
 
-        let stream = fs.createReadStream(this.path)
-        stream.on('data', data => {
-            reader(data.toString().trim())
+        this.reader = reader
+        this._reader()
+    }
+
+    _reader() {
+        fs.readFile(this.path, (err, data) => {
+            this.reader && this.reader(data.toString().trim())
+            this._reader()
         })
     }
 
     read(callback) {
         this.throwIfClosed()
 
-        return fs.readFile(this.path, (err, data) => {
+        fs.readFile(this.path, (err, data) => {
             callback && callback(data.toString().trim())
         })
     }

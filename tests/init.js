@@ -20,6 +20,12 @@ describe('Initialization', function() {
         expect(stat.isFIFO()).to.be.true
     })
 
+    it('should preserve fifo when closed', function() {
+        new FIFO(fifo.path).close()
+        let stat = fs.statSync(fifo.path)
+        expect(stat.isFIFO()).to.be.true
+    })
+
     it('should not exist a fifo at the objects path', function() {
         fifo.close()
         expect(fs.statSync.bind(fs, fifo.path)).to.throw(Error)

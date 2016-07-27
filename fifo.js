@@ -5,7 +5,6 @@ const cp = require('child_process'),
 class FIFO {
     constructor(path) {
         this.path = path || this._generateFifoPath()
-        this.children = []
 
         this._initFifo()
         this.open = true
@@ -36,10 +35,9 @@ class FIFO {
     }
 
     _generateFifoPath() {
-        let random
         let path
         do {
-            random = Math.floor(Math.random() * 8999 + 1000)
+            let random = Math.floor(Math.random() * 8999 + 1000)
             path = '/tmp/fifo-js-' + random + '.fifo'
         } while (this._statSafe(path))
 
@@ -71,27 +69,23 @@ class FIFO {
 
     write(string, callback) {
         if (this.open) {
-            let child = cp.exec('echo "' + string + '" > ' + this.path, callback)
-            this.children.push(child)
+            let writer = fs.createWriteStream(this.path, { autoClose: true })
+            writer.end(...arguments)
         }
     }
 
     writeSync(string) {
         if (this.open) {
             let child = cp.execSync('echo "' + string + '" > ' + this.path)
+            return string
         }
     }
 
     close() {
         this.open = false
-        this._killChildren()
         if (!this.preserve) {
             this._unlink()
         }
-    }
-
-    _killChildren() {
-        this.children.forEach(child => child.kill())
     }
 
     _unlink() {

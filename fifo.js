@@ -45,7 +45,7 @@ class FIFO {
     }
 
     setReader(reader) {
-        this.checkIfOpen()
+        this.throwIfOpen()
 
         let stream = fs.createReadStream(this.path)
         stream.on('data', data => {
@@ -54,7 +54,7 @@ class FIFO {
     }
 
     read(callback) {
-        this.checkIfOpen()
+        this.throwIfOpen()
 
         return fs.readFile(this.path, (err, data) => {
             callback && callback(data.toString())
@@ -66,20 +66,20 @@ class FIFO {
      * up the node process.
      */
     readSync() {
-        this.checkIfOpen()
+        this.throwIfOpen()
 
         return fs.readFileSync(this.path).toString()
     }
 
     write(string, callback) {
-        this.checkIfOpen()
+        this.throwIfOpen()
 
         let writer = fs.createWriteStream(this.path, { autoClose: true })
         writer.end(...arguments)
     }
 
     writeSync(string) {
-        this.checkIfOpen()
+        this.throwIfOpen()
 
         let child = cp.execSync('echo "' + string + '" > ' + this.path)
         return string
@@ -98,7 +98,7 @@ class FIFO {
         }
     }
 
-    checkIfOpen() {
+    throwIfOpen() {
         if (!this.open) {
             throw new FifoException(this.path, "Fifo isn't open.")
         }

@@ -92,6 +92,7 @@ class FIFO {
 
     close() {
         this.open = false
+
         if (!this.preserve) {
             this._unlink()
         }

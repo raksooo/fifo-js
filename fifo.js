@@ -45,7 +45,7 @@ class FIFO {
     }
 
     setReader(reader) {
-        this.throwIfClosed()
+        this._throwIfClosed()
 
         this.reader = reader
         this._reader()
@@ -53,16 +53,20 @@ class FIFO {
 
     _reader() {
         fs.readFile(this.path, (err, data) => {
-            this.reader && this.reader(data.toString().trim())
-            this._reader()
+            if (this.open) {
+                this.reader && this.reader(data.toString().trim())
+                this._reader()
+            }
         })
     }
 
     read(callback) {
-        this.throwIfClosed()
+        this._throwIfClosed()
 
         fs.readFile(this.path, (err, data) => {
-            callback && callback(data.toString().trim())
+            if (this.open && callback) {
+                callback(data.toString().trim())
+            }
         })
     }
 
@@ -71,20 +75,24 @@ class FIFO {
      * up the node process.
      */
     readSync() {
-        this.throwIfClosed()
+        this._throwIfClosed()
 
         return fs.readFileSync(this.path).toString().trim()
     }
 
     write(string, callback) {
-        this.throwIfClosed()
+        this._throwIfClosed()
 
         let writer = fs.createWriteStream(this.path, { autoClose: true })
-        writer.end(...arguments)
+        writer.end(string, () => {
+            if (this.open && callback) {
+                callback()
+            }
+        })
     }
 
     writeSync(string) {
-        this.throwIfClosed()
+        this._throwIfClosed()
 
         let child = cp.execSync('echo "' + string + '" > ' + this.path)
         return string
@@ -104,7 +112,7 @@ class FIFO {
         }
     }
 
-    throwIfClosed() {
+    _throwIfClosed() {
         if (!this.open) {
             throw new FIFOError(this.path, "Fifo isn't open.")
         }

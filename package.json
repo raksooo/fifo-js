@@ -4,7 +4,9 @@
   "description": "Filesystem FIFO file handler",
   "main": "fifo.js",
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^2.5.3"
+  },
   "directories": {
     "test": "tests"
   },

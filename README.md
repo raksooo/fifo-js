@@ -50,9 +50,6 @@ fifo.write(string)
 fifo.close()
 ```
 
-## Todo
-* Write tests.
-
 ## Contact
 * http://oskarnyberg.com
 * oskar@oskarnyberg.com

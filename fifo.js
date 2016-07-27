@@ -1,6 +1,6 @@
 const cp = require('child_process'),
       fs = require('fs'),
-      FifoException = require('./fifoException')
+      FIFOError = require('./fifoError')
 
 class FIFO {
     constructor(path) {
@@ -15,7 +15,7 @@ class FIFO {
         if (!stat) {
             this._createFifo()
         } else if (!stat.isFIFO()) {
-            throw new FifoException(this.path,
+            throw new FIFOError(this.path,
                     "Non fifo file with this name already exists.")
         } else {
             this.preserve = true
@@ -100,7 +100,7 @@ class FIFO {
 
     throwIfOpen() {
         if (!this.open) {
-            throw new FifoException(this.path, "Fifo isn't open.")
+            throw new FIFOError(this.path, "Fifo isn't open.")
         }
     }
 

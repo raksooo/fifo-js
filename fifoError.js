@@ -1,9 +1,10 @@
-class FifoException {
-    constructor(_name, _message) {
-        this.message = _message
-        this.name = _name
+const ExtendableError = require('es6-error')
+
+class FIFOError extends ExtendableError {
+    constructor(name, message) {
+        super(name + ': ' + message)
     }
 }
 
-module.exports = FifoException
+module.exports = FIFOError
 

@@ -1,6 +1,6 @@
 const expect = require('chai').expect,
       FIFO = require('../fifo'),
-      FifoException = require('../fifoException'),
+      FIFOError = require('../fifoError'),
       fs = require('fs')
 
 describe('Initialization', function() {
@@ -28,7 +28,7 @@ describe('Initialization', function() {
     it('should throw exception since non-fifo file exists', function() {
         exceptionPath = 'exceptionTest.fifo'
         fs.closeSync(fs.openSync(exceptionPath, 'w'))
-        expect(() => new FIFO(exceptionPath)).to.throw(Error)
+        expect(() => new FIFO(exceptionPath)).to.throw(FIFOError)
     })
 })
 

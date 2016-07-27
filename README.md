@@ -35,9 +35,7 @@ let fifo = new FIFO([path])
 fifo.read(text => {
     // text contains the text which was read from the fifo.
 })
-```
 
-```Javascript
 let text = fifo.readSync()
 ```
 Warning: readSync locks up the node process which places it in a deadlock. This
@@ -58,9 +56,7 @@ fifo.setReader(text => {
 fifo.write(text, () => {
     // The written text has been read.
 })
-```
 
-```Javascript
 fifo.writeSync(text)
 ```
 

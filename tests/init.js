@@ -4,7 +4,6 @@ const expect = require('chai').expect,
       fs = require('fs')
 
 describe('Initialization', function() {
-
     describe('File', function() {
         let fifo
 
@@ -34,20 +33,11 @@ describe('Initialization', function() {
         expect(fs.statSync.bind(fs, fifo.path)).to.throw(Error)
     })
 
-    describe('Non fifo file', function() {
+    it('should throw exception since non-fifo file exists', function() {
         let exceptionPath = 'exceptionTest.fifo'
-
-        before(function() {
-            fs.closeSync(fs.openSync(exceptionPath, 'w'))
-        })
-
-        after(function() {
-            fs.unlink(exceptionPath)
-        })
-
-        it('should throw exception since non-fifo file exists', function() {
-            expect(() => new FIFO(exceptionPath)).to.throw(FIFOError)
-        })
+        fs.closeSync(fs.openSync(exceptionPath, 'w'))
+        expect(() => new FIFO(exceptionPath)).to.throw(FIFOError)
+        fs.unlink(exceptionPath)
     })
 })
 

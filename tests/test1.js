@@ -1,25 +1,29 @@
 const FIFO = require('../fifo')
 
 let fifo = new FIFO('asdf.fifo')
+fifo.write('1\n', () => {
+    console.log('in: 1')
+})
+fifo.read((data) => {
+    console.log('out: ', data)
+})
+
 setTimeout(() => {
-    fifo.write('1', (data) => {
-        console.log('in: ', data)
-    })
     fifo.read((data) => {
         console.log('out: ', data)
     })
-
-    fifo.write('2', (data) => {
-        console.log('in: ', data)
+    fifo.write('2\n', () => {
+        console.log('in: 2')
     })
-    console.log('out:', fifo.readSync())
+}, 100)
 
+setTimeout(() => {
     fifo.read((data) => {
         console.log('out: ', data)
     })
-    console.log(fifo.writeSync('3'))
+    console.log(fifo.writeSync('4\n'))
+}, 400)
 
-
+setTimeout(() => {
     fifo.close()
-}, 2000)
-
+}, 500)

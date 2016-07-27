@@ -61,6 +61,10 @@ class FIFO {
         })
     }
 
+    /**
+     * Warning: Doesn't work in combination with fifo.write() since this locks
+     * up the node process.
+     */
     readSync() {
         this.checkIfOpen()
 

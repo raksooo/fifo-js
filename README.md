@@ -15,7 +15,7 @@ const FIFO = require('fifo-js')
 
 let fifo = new FIFO()
 
-fifo.setReader(console.log.bind(console))
+fifo.read(console.log.bind(console))
 
 fifo.write('foo')
 
@@ -32,17 +32,36 @@ let fifo = new FIFO([path])
 
 ### Read
 ```Javascript
-let content = fifo.read()
+fifo.read(text => {
+    // text contains the text which was read from the fifo.
+})
 ```
 
-### Listener
 ```Javascript
-fifo.setReader(callback)
+let text = fifo.readSync()
+```
+Warning: readSync locks up the node process which places it in a deadlock. This
+can only be used if the write takes place outside of this process, i.e. you
+cannot use it in combination with the write function in the same fifo object.
+
+
+### Listener
+This function will read until the fifo is closed.
+```Javascript
+fifo.setReader(text => {
+    // text contains the text which was read from the fifo.
+})
 ```
 
 ### Write
 ```Javascript
-fifo.write(string)
+fifo.write(text, () => {
+    // The written text has been read.
+})
+```
+
+```Javascript
+fifo.writeSync(text)
 ```
 
 ### Close

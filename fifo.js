@@ -45,40 +45,40 @@ class FIFO {
     }
 
     setReader(reader) {
-        if (this.open) {
-            let stream = fs.createReadStream(this.path)
-            stream.on('data', data => {
-                reader(data.toString())
-            })
-        }
+        this.checkIfOpen()
+
+        let stream = fs.createReadStream(this.path)
+        stream.on('data', data => {
+            reader(data.toString())
+        })
     }
 
     read(callback) {
-        if (this.open) {
-            return fs.readFile(this.path, (err, data) => {
-                callback && callback(data.toString())
-            })
-        }
+        this.checkIfOpen()
+
+        return fs.readFile(this.path, (err, data) => {
+            callback && callback(data.toString())
+        })
     }
 
     readSync() {
-        if (this.open) {
-            return fs.readFileSync(this.path).toString()
-        }
+        this.checkIfOpen()
+
+        return fs.readFileSync(this.path).toString()
     }
 
     write(string, callback) {
-        if (this.open) {
-            let writer = fs.createWriteStream(this.path, { autoClose: true })
-            writer.end(...arguments)
-        }
+        this.checkIfOpen()
+
+        let writer = fs.createWriteStream(this.path, { autoClose: true })
+        writer.end(...arguments)
     }
 
     writeSync(string) {
-        if (this.open) {
-            let child = cp.execSync('echo "' + string + '" > ' + this.path)
-            return string
-        }
+        this.checkIfOpen()
+
+        let child = cp.execSync('echo "' + string + '" > ' + this.path)
+        return string
     }
 
     close() {
@@ -91,6 +91,12 @@ class FIFO {
     _unlink() {
         if (this._statSafe(this.path)) {
             fs.unlinkSync(this.path)
+        }
+    }
+
+    checkIfOpen() {
+        if (!this.open) {
+            throw new FifoException(this.path, "Fifo isn't open.")
         }
     }
 

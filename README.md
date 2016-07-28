@@ -33,17 +33,20 @@ let fifo = new FIFO([path])
 ### Read
 ```Javascript
 fifo.read(text => {
-    // text contains the text which was read from the fifo.
+    // 'text' contains the text which was read from the fifo.
 })
 
 let text = fifo.readSync()
+// 'text' contains the text which was read from the fifo.
 ```
 
 ### Listener
-This function will read until the fifo is closed.
+This function will read and call the callback for each message until the fifo
+is closed. If read or readSync is called after a reader is set a FIFOError is
+thrown.
 ```Javascript
 fifo.setReader(text => {
-    // text contains the text which was read from the fifo.
+    // 'text' contains the text which was read from the fifo.
 })
 ```
 
@@ -54,6 +57,7 @@ fifo.write(text, () => {
 })
 
 fifo.writeSync(text)
+// The written text has been read.
 ```
 
 ### Close

@@ -6,6 +6,7 @@ class FIFO {
     constructor(path) {
         this.path = path || this._generateFifoPath()
 
+        this._children = []
         this._initFifo()
         this._open = true
     }
@@ -17,11 +18,11 @@ class FIFO {
     read(callback) {
         this._throwIfClosed()
 
-        fs.readFile(this.path, (err, data) => {
-            if (this.open && callback) {
-                callback(data.toString().trim())
-            }
+        let cmd = this._generateReadCommand()
+        let child = cp.exec(cmd, (err, stdout, stderr) => {
+            callback && callback(stdout.trim())
         })
+        this._children.push(child)
     }
 
     /**
@@ -31,37 +32,43 @@ class FIFO {
     readSync() {
         this._throwIfClosed()
 
-        return fs.readFileSync(this.path).toString().trim()
+        let cmd = this._generateReadCommand()
+        return cp.execSync(cmd).trim()
     }
 
-    setReader(reader) {
+    setReader(callback) {
         this._throwIfClosed()
 
-        this.reader = reader
-        this._reader()
+        let cmd = this._generateReadCommand()
+        let child = cp.exec(cmd, (err, stdout, stderr) => {
+            this.setReader(callback)
+            callback && callback(stdout.trim())
+
+            let index = this._children.indexOf(child)
+            this._children = this._children.splice(index, 1)
+        })
+        this._children.push(child)
     }
 
     write(string, callback) {
         this._throwIfClosed()
 
-        let writer = fs.createWriteStream(this.path, { autoClose: true })
-        writer.end(string, () => {
-            if (this.open && callback) {
-                callback()
-            }
-        })
+        let cmd = this._generateWriteCommand(string)
+        let child = cp.exec(cmd, () => callback && callback())
+        this._children.push(child)
     }
 
     writeSync(string) {
         this._throwIfClosed()
 
-        let child = cp.execSync('echo "' + string + '" > ' + this.path)
-        return string
+        let cmd = this._generateWriteCommand(string)
+        cp.execSync(cmd)
     }
 
     close() {
         this._open = false
 
+        this._killAllChildren()
         if (!this.preserve) {
             this._unlink()
         }
@@ -83,6 +90,14 @@ class FIFO {
         cp.execSync('mkfifo ' + this.path)
     }
 
+    _generateWriteCommand(string) {
+        return 'echo "' + string + '" > ' + this.path
+    }
+
+    _generateReadCommand() {
+        return 'cat ' + this.path
+    }
+
     _pathExists(path) {
         path = path || this.path
         try {
@@ -102,19 +117,14 @@ class FIFO {
         return path
     }
 
-    _reader() {
-        fs.readFile(this.path, (err, data) => {
-            if (this.open) {
-                this.reader && this.reader(data.toString().trim())
-                this._reader()
-            }
-        })
-    }
-
     _unlink() {
         if (this._pathExists()) {
             fs.unlinkSync(this.path)
         }
+    }
+
+    _killAllChildren() {
+        this._children.forEach(child => child.kill())
     }
 
     _throwIfClosed() {

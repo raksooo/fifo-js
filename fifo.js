@@ -82,23 +82,6 @@ class FIFO {
         cp.execSync('mkfifo ' + this.path)
     }
 
-    _generateWriteCommand(string) {
-        return 'echo -n "' + string + '" > ' + this.path
-    }
-
-    _generateReadCommand() {
-        return 'cat ' + this.path
-    }
-
-    _pathExists(path) {
-        path = path || this.path
-        try {
-            return fs.statSync(path)
-        } catch(e) {
-            return false
-        }
-    }
-
     _generateFifoPath() {
         let path
         do {
@@ -107,6 +90,14 @@ class FIFO {
         } while (this._pathExists(path))
 
         return path
+    }
+
+    _generateWriteCommand(string) {
+        return 'echo -n "' + string + '" > ' + this.path
+    }
+
+    _generateReadCommand() {
+        return 'cat ' + this.path
     }
 
     _reader(callback) {
@@ -121,14 +112,23 @@ class FIFO {
         this._children.push(child)
     }
 
+    _killAllChildren() {
+        this._children.forEach(child => child.kill())
+    }
+
+    _pathExists(path) {
+        path = path || this.path
+        try {
+            return fs.statSync(path)
+        } catch(e) {
+            return false
+        }
+    }
+
     _unlink() {
         if (this._pathExists()) {
             fs.unlinkSync(this.path)
         }
-    }
-
-    _killAllChildren() {
-        this._children.forEach(child => child.kill())
     }
 
     _throwIfClosed() {

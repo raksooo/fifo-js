@@ -1,7 +1,11 @@
-const expect = require('chai').expect,
+const chai = require('chai'),
+      chaiString = require('chai-string'),
       FIFO = require('../fifo'),
       FIFOError = require('../fifoError'),
       fs = require('fs')
+
+chai.use(chaiString)
+const expect = chai.expect
 
 describe('Initialization', function() {
     describe('File', function() {
@@ -25,6 +29,18 @@ describe('Initialization', function() {
             let stat = fs.statSync(fifo.path)
             expect(stat.isFIFO()).to.be.true
         })
+    })
+
+    it('should create fifo in /tmp', function() {
+        let fifo = new FIFO()
+        expect(fifo.path).to.startsWith('/tmp')
+        fifo.close()
+    })
+
+    it('should create fifo outside of /tmp', function() {
+        let fifo = new FIFO('testFifo.fifo')
+        expect(fifo.path).to.not.startsWith('/tmp')
+        fifo.close()
     })
 
     it('should not exist a fifo at the objects path', function() {

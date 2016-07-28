@@ -4,6 +4,7 @@
   "description": "Filesystem FIFO file handler",
   "main": "fifo.js",
   "dependencies": {
+    "chai-string": "^1.2.0",
     "es6-error": "^3.0.1"
   },
   "devDependencies": {

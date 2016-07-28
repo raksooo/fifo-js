@@ -46,6 +46,13 @@ describe('Read and write', function() {
         expect(data).to.equal(string)
     })
 
+    it('should preserve newline and spaces at start and end of string', function() {
+        let string = ' Test string 5\n'
+        fifo.write(string)
+        let data = fifo.readSync()
+        expect(data).to.equal(string)
+    })
+
     it('should read all values that\'s written', function(done) {
         let reads = 0
 

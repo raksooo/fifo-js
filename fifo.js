@@ -17,6 +17,7 @@ class FIFO {
 
     read(callback) {
         this._throwIfClosed()
+        this._throwIfReader()
 
         let cmd = this._generateReadCommand()
         let child = cp.exec(cmd, (err, stdout, stderr) => {
@@ -27,6 +28,7 @@ class FIFO {
 
     readSync() {
         this._throwIfClosed()
+        this._throwIfReader()
 
         let cmd = this._generateReadCommand()
         return cp.execSync(cmd).toString()
@@ -34,16 +36,10 @@ class FIFO {
 
     setReader(callback) {
         this._throwIfClosed()
+        this._throwIfReader()
+        this.reader = true
 
-        let cmd = this._generateReadCommand()
-        let child = cp.exec(cmd, (err, stdout, stderr) => {
-            this.setReader(callback)
-            callback && callback(stdout)
-
-            let index = this._children.indexOf(child)
-            this._children = this._children.splice(index, 1)
-        })
-        this._children.push(child)
+        this._reader(callback)
     }
 
     write(string, callback) {
@@ -113,6 +109,18 @@ class FIFO {
         return path
     }
 
+    _reader(callback) {
+        let cmd = this._generateReadCommand()
+        let child = cp.exec(cmd, (err, stdout, stderr) => {
+            this._reader(callback)
+            callback && callback(stdout)
+
+            let index = this._children.indexOf(child)
+            this._children = this._children.splice(index, 1)
+        })
+        this._children.push(child)
+    }
+
     _unlink() {
         if (this._pathExists()) {
             fs.unlinkSync(this.path)
@@ -126,6 +134,13 @@ class FIFO {
     _throwIfClosed() {
         if (!this.open) {
             throw new FIFOError(this.path, "Fifo isn't open.")
+        }
+    }
+
+    _throwIfReader() {
+        if (this.reader) {
+            throw new FIFOError(this.path,
+                    'Cannot read or set another reader if a reader is set.')
         }
     }
 }

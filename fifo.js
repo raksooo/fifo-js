@@ -20,7 +20,7 @@ class FIFO {
 
         let cmd = this._generateReadCommand()
         let child = cp.exec(cmd, (err, stdout, stderr) => {
-            callback && callback(stdout.trim())
+            callback && callback(stdout)
         })
         this._children.push(child)
     }
@@ -29,7 +29,7 @@ class FIFO {
         this._throwIfClosed()
 
         let cmd = this._generateReadCommand()
-        return cp.execSync(cmd).toString().trim()
+        return cp.execSync(cmd).toString()
     }
 
     setReader(callback) {
@@ -38,7 +38,7 @@ class FIFO {
         let cmd = this._generateReadCommand()
         let child = cp.exec(cmd, (err, stdout, stderr) => {
             this.setReader(callback)
-            callback && callback(stdout.trim())
+            callback && callback(stdout)
 
             let index = this._children.indexOf(child)
             this._children = this._children.splice(index, 1)
@@ -87,7 +87,7 @@ class FIFO {
     }
 
     _generateWriteCommand(string) {
-        return 'echo "' + string + '" > ' + this.path
+        return 'echo -n "' + string + '" > ' + this.path
     }
 
     _generateReadCommand() {

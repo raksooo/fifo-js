@@ -1,5 +1,6 @@
 const expect = require('chai').expect,
-      FIFO = require('../fifo')
+      FIFO = require('../fifo'),
+      FIFOError = require('../fifoError')
 
 describe('Read and write', function() {
     let fifo
@@ -53,21 +54,38 @@ describe('Read and write', function() {
         expect(data).to.equal(string)
     })
 
-    it('should read all values that\'s written', function(done) {
-        let reads = 0
+    describe('Reader', function() {
+        let fifo
 
-        fifo.setReader(data => {
-            reads++
-            if (data === 'last') {
-                expect(reads).to.equal(2)
-                done()
-            }
+        beforeEach(function() {
+            fifo = new FIFO()
         })
 
-        fifo.writeSync('first')
-        setTimeout(() => {
-            fifo.writeSync('last')
-        }, 10)
+        afterEach(function() {
+            fifo.close()
+        })
+
+        it('should read all values that\'s written', function(done) {
+            let reads = 0
+
+            fifo.setReader(data => {
+                reads++
+                if (data === 'last') {
+                    expect(reads).to.equal(2)
+                    done()
+                }
+            })
+
+            fifo.writeSync('first')
+            setTimeout(() => {
+                fifo.writeSync('last')
+            }, 10)
+        })
+
+        it('should throw when reading while reader is set', function() {
+            fifo.setReader()
+            expect(fifo.read.bind(fifo)).to.throw(FIFOError)
+        })
     })
 })
 

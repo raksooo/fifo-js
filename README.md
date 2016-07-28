@@ -38,10 +38,6 @@ fifo.read(text => {
 
 let text = fifo.readSync()
 ```
-Warning: readSync locks up the node process which places it in a deadlock. This
-can only be used if the write takes place outside of this process, i.e. you
-cannot use it in combination with the write function in the same fifo object.
-
 
 ### Listener
 This function will read until the fifo is closed.

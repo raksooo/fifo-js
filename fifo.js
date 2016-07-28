@@ -25,15 +25,11 @@ class FIFO {
         this._children.push(child)
     }
 
-    /**
-     * Warning: Doesn't work in combination with fifo.write() since this locks
-     * up the node process.
-     */
     readSync() {
         this._throwIfClosed()
 
         let cmd = this._generateReadCommand()
-        return cp.execSync(cmd).trim()
+        return cp.execSync(cmd).toString().trim()
     }
 
     setReader(callback) {

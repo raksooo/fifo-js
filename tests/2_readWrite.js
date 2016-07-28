@@ -39,6 +39,13 @@ describe('Read and write', function() {
         fifo.writeSync(string)
     })
 
+    it('should read asyncronously and write synchronously', function() {
+        let string = 'Test string 4'
+        fifo.write(string)
+        let data = fifo.readSync()
+        expect(data).to.equal(string)
+    })
+
     describe('Reader', function() {
         this.timeout(2000)
         it('should read all values that\'s written', function(done) {

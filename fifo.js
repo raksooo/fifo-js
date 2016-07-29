@@ -39,15 +39,15 @@ class FIFO {
     setReader(callback) {
         this._throwIfClosed()
         this._throwIfReader()
-        this.reader = true
 
+        this.reader = true
         this._reader(callback)
     }
 
     removeReader() {
+        this.reader = false
         this._readerChild.kill()
         delete this._readerChild
-        this.reader = false
     }
 
     write(string, callback) {
@@ -117,7 +117,7 @@ class FIFO {
     _reader(callback) {
         let cmd = this._generateReadCommand()
         let child = cp.exec(cmd, (err, stdout, stderr) => {
-            if (this.open && callback) {
+            if (this.reader && this.open && callback) {
                 this._reader(callback)
                 callback(stdout)
             }

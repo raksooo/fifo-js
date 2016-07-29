@@ -42,6 +42,12 @@ class FIFO {
         this._reader(callback)
     }
 
+    removeReader() {
+        this._readerChild.kill()
+        delete this._readerChild
+        this.reader = false
+    }
+
     write(string, callback) {
         this._throwIfClosed()
 
@@ -105,14 +111,12 @@ class FIFO {
         let child = cp.exec(cmd, (err, stdout, stderr) => {
             this._reader(callback)
             callback && callback(stdout)
-
-            let index = this._children.indexOf(child)
-            this._children = this._children.splice(index, 1)
         })
-        this._children.push(child)
+        this._readerChild = child
     }
 
     _killAllChildren() {
+        this._readerChild && this._readerChild.kill()
         this._children.forEach(child => child.kill())
     }
 

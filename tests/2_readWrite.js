@@ -17,39 +17,42 @@ describe('Read and write', function() {
         let string = 'Test string 1'
         fifo.write(string)
         fifo.read(data => {
-            expect(data).to.equal(string)
+            expect(data).to.not.equal(string)
+            expect(data).to.equal(string + '\n')
             done()
         })
     })
 
-    it('should read and write asynchronously', function(done) {
+    it('should not have a trailing new line', function(done) {
         let string = 'Test string 2'
         fifo.read(data => {
             expect(data).to.equal(string)
             done()
         })
-        fifo.write(string)
+        fifo.write(string, true)
     })
 
-    it('should read asyncronously and write synchronously', function(done) {
+    it('should read and write asynchronously', function(done) {
         let string = 'Test string 3'
         fifo.read(data => {
             expect(data).to.equal(string)
             done()
         })
-        fifo.writeSync(string)
+        fifo.write(string, true)
+    })
+
+    it('should read asyncronously and write synchronously', function(done) {
+        let string = 'Test string 4'
+        fifo.read(data => {
+            expect(data).to.equal(string)
+            done()
+        })
+        fifo.writeSync(string, true)
     })
 
     it('should read asyncronously and write synchronously', function() {
-        let string = 'Test string 4'
-        fifo.write(string)
-        let data = fifo.readSync()
-        expect(data).to.equal(string)
-    })
-
-    it('should preserve newline and spaces at start and end of string', function() {
-        let string = ' Test string 5\n'
-        fifo.write(string)
+        let string = 'Test string 5'
+        fifo.write(string, true)
         let data = fifo.readSync()
         expect(data).to.equal(string)
     })
@@ -71,7 +74,7 @@ describe('Read and write', function() {
             fifo.setReader(data => {
                 reads++
                 if (data === 'first') {
-                    fifo.writeSync('last')
+                    fifo.writeSync('last', true)
                 } else if (data === 'last') {
                     expect(reads).to.equal(2)
                     done()
@@ -80,7 +83,7 @@ describe('Read and write', function() {
                 }
             })
 
-            fifo.writeSync('first')
+            fifo.writeSync('first', true)
         })
 
         it('should read properly after reader has been closed', function(done) {
@@ -91,13 +94,13 @@ describe('Read and write', function() {
                         expect(data).to.equal('last')
                         done()
                     })
-                    fifo.writeSync('last')
+                    fifo.writeSync('last', true)
                 } else {
                     throw new Error('Should not get here: ' + data)
                 }
             })
 
-            fifo.writeSync('first')
+            fifo.writeSync('first', true)
         })
 
         it('should throw when reading while reader is set', function() {

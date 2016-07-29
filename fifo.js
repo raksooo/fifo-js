@@ -50,10 +50,14 @@ class FIFO {
         delete this._readerChild
     }
 
-    write(string, callback) {
+    write(string, trim, callback) {
+        if (typeof trim === 'function') {
+            callback = trim
+            trim = false
+        }
         this._throwIfClosed()
 
-        let cmd = this._generateWriteCommand(string)
+        let cmd = this._generateWriteCommand(string, trim)
         let child = cp.exec(cmd, () => {
             if (this.open && callback) {
                 callback()
@@ -62,10 +66,10 @@ class FIFO {
         this._children.push(child)
     }
 
-    writeSync(string) {
+    writeSync(string, trim) {
         this._throwIfClosed()
 
-        let cmd = this._generateWriteCommand(string)
+        let cmd = this._generateWriteCommand(string, trim)
         cp.execSync(cmd)
     }
 
@@ -106,8 +110,8 @@ class FIFO {
         return path
     }
 
-    _generateWriteCommand(string) {
-        return 'echo -n "' + string + '" > ' + this.path
+    _generateWriteCommand(string, trim) {
+        return 'echo' + (trim ? ' -n' : '') + ' "' + string + '" > ' + this.path
     }
 
     _generateReadCommand() {

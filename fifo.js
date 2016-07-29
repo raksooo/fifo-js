@@ -64,11 +64,13 @@ class FIFO {
     }
 
     close() {
-        this._open = false
+        if (this._open) {
+            this._open = false
 
-        this._killAllChildren()
-        if (!this.preserve) {
-            this._unlink()
+            this._killAllChildren()
+            if (!this.preserve) {
+                this._unlink()
+            }
         }
     }
 

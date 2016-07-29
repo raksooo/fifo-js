@@ -64,7 +64,7 @@ fifo.setReader(text => {
 ```
 
 ### Write
-When writing the boolean flag 'trim' can be supplied. This makes prevents a
+When writing the boolean flag 'trim' can be supplied. This prevents a
 trailing new line to be added.
 
 #### Asynchronous

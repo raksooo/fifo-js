@@ -31,6 +31,19 @@ let fifo = new FIFO([path])
 ```
 
 ### Read
+#### Asynchronous
+```Javascript
+fifo.read(callback)
+
+callback:Function(data:String)
+```
+
+#### Synchronous
+```Javascript
+fifo.readSync()
+```
+
+#### Example
 ```Javascript
 fifo.read(text => {
     // 'text' contains the text which was read from the fifo.
@@ -51,12 +64,26 @@ fifo.setReader(text => {
 ```
 
 ### Write
+When writing the boolean flag 'trim' can be supplied. This makes prevents a
+trailing new line to be added.
+
+#### Asynchronous
+```Javascript
+fifo.write(data:String, trim:Boolean, callback:Function())
+```
+
+#### Synchronous
+```Javascript
+fifo.writeSync(data:String, trim:Boolean)
+```
+
+#### Example
 ```Javascript
 fifo.write(text, () => {
     // The written text has been read.
 })
 
-fifo.writeSync(text)
+fifo.writeSync(text, true)
 // The written text has been read.
 ```
 

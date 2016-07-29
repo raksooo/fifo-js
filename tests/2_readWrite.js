@@ -70,16 +70,34 @@ describe('Read and write', function() {
 
             fifo.setReader(data => {
                 reads++
-                if (data === 'last') {
+                if (data === 'first') {
+                    fifo.writeSync('last')
+                } else if (data === 'last') {
                     expect(reads).to.equal(2)
                     done()
+                } else {
+                    throw new Error('Should not get here: ' + data)
                 }
             })
 
             fifo.writeSync('first')
-            setTimeout(() => {
-                fifo.writeSync('last')
-            }, 10)
+        })
+
+        it('should read properly after reader has been closed', function(done) {
+            fifo.setReader(data => {
+                if (data === 'first') {
+                    fifo.removeReader()
+                    fifo.read(data => {
+                        expect(data).to.equal('last')
+                        done()
+                    })
+                    fifo.writeSync('last')
+                } else {
+                    throw new Error('Should not get here: ' + data)
+                }
+            })
+
+            fifo.writeSync('first')
         })
 
         it('should throw when reading while reader is set', function() {
@@ -87,7 +105,7 @@ describe('Read and write', function() {
             expect(fifo.read.bind(fifo)).to.throw(FIFOError)
         })
 
-        it('should allow read when reader is removed', function() {
+        it('should allow reading after reader has been removed', function() {
             fifo.setReader()
             fifo.removeReader()
             expect(fifo.read.bind(fifo)).to.not.throw(Error)

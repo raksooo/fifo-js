@@ -86,6 +86,12 @@ describe('Read and write', function() {
             fifo.setReader()
             expect(fifo.read.bind(fifo)).to.throw(FIFOError)
         })
+
+        it('should allow read when reader is removed', function() {
+            fifo.setReader()
+            fifo.removeReader()
+            expect(fifo.read.bind(fifo)).to.not.throw(Error)
+        })
     })
 })
 

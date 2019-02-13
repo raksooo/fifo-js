@@ -3,8 +3,9 @@ const cp = require('child_process'),
       FIFOError = require('./fifoError')
 
 class FIFO {
-    constructor(path) {
+    constructor(path, encoding) {
         this.path = path || this._generateFifoPath()
+        this.encoding = encoding || "utf8"
 
         this._children = []
         this._initFifo()
@@ -20,7 +21,9 @@ class FIFO {
         this._throwIfReader()
 
         let cmd = this._generateReadCommand()
-        let child = cp.exec(cmd, (err, stdout, stderr) => {
+        let child = cp.exec(cmd, {
+              encoding: this.encoding
+        }, (err, stdout, stderr) => {
             if (this.open && callback) {
                 callback(stdout)
             }
@@ -33,7 +36,9 @@ class FIFO {
         this._throwIfReader()
 
         let cmd = this._generateReadCommand()
-        return cp.execSync(cmd).toString()
+        return cp.execSync(cmd, {
+              encoding: this.encoding
+        })
     }
 
     setReader(callback) {
@@ -58,7 +63,9 @@ class FIFO {
         this._throwIfClosed()
 
         let cmd = this._generateWriteCommand(string, trim)
-        let child = cp.exec(cmd, () => {
+        let child = cp.exec(cmd, {
+              encoding: this.encoding
+        }, () => {
             if (this.open && callback) {
                 callback()
             }
@@ -120,7 +127,9 @@ class FIFO {
 
     _reader(callback) {
         let cmd = this._generateReadCommand()
-        let child = cp.exec(cmd, (err, stdout, stderr) => {
+        let child = cp.exec(cmd, {
+              encoding: this.encoding
+        }, (err, stdout, stderr) => {
             if (this.reader && this.open && callback) {
                 this._reader(callback)
                 callback(stdout)
